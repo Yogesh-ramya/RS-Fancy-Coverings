@@ -61,7 +61,7 @@ export default function AdminDashboard() {
         </p>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
         {cards.map((card, i) => (
           <motion.div
             key={card.label}
@@ -80,7 +80,7 @@ export default function AdminDashboard() {
               <p className="text-[10px] uppercase tracking-widest text-foreground/40 font-bold mb-1">
                 {card.label}
               </p>
-              <h3 className="text-3xl font-premium font-bold tracking-tight text-foreground/80">
+              <h3 className="text-xl sm:text-3xl font-premium font-bold tracking-tight text-foreground/80">
                 {card.value}
               </h3>
             </div>

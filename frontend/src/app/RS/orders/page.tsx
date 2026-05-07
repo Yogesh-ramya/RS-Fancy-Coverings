@@ -95,19 +95,83 @@ export default function OrdersAdmin() {
         <div className="py-20 text-center font-premium text-xl text-foreground/20 italic">Loading your orders...</div>
       ) : (
         <div className="bg-white border border-gold-primary/10 shadow-sm overflow-hidden">
-          <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gold-primary/20">
-            <table className="w-full text-left border-collapse min-w-[1000px]">
-              <thead>
-                <tr className="bg-[#FAF9F6] border-b border-gold-primary/10">
-                <th className="p-6 text-[10px] uppercase tracking-[0.2em] font-bold text-gold-primary">Order Date</th>
-                <th className="p-6 text-[10px] uppercase tracking-[0.2em] font-bold text-gold-primary">Customer Details</th>
-                <th className="p-6 text-[10px] uppercase tracking-[0.2em] font-bold text-gold-primary">Items</th>
-                <th className="p-6 text-[10px] uppercase tracking-[0.2em] font-bold text-gold-primary">Transaction (UPI 4)</th>
-                <th className="p-6 text-[10px] uppercase tracking-[0.2em] font-bold text-gold-primary">Total Price</th>
-                <th className="p-6 text-[10px] uppercase tracking-[0.2em] font-bold text-gold-primary">Status</th>
-                <th className="p-6 text-[10px] uppercase tracking-[0.2em] font-bold text-gold-primary">Actions</th>
-              </tr>
-            </thead>
+            {/* Mobile View: Order Cards */}
+            <div className="md:hidden divide-y divide-gold-primary/5 bg-white">
+              {orders.length > 0 ? orders.map((order) => (
+                <div key={order._id} className="p-6 space-y-4 hover:bg-gold-soft/5 transition-colors">
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-1">
+                       <p className="font-premium font-bold text-sm tracking-tight capitalize">{order.customerName}</p>
+                       <p className="text-[10px] text-foreground/40 font-bold uppercase tracking-widest">{new Date(order.createdAt).toLocaleDateString("en-IN")}</p>
+                    </div>
+                    <span className={`px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest border border-dashed ${getStatusColor(order.status)}`}>
+                      {order.status}
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-2 text-[11px] text-foreground/60">
+                    <div className="flex items-center gap-2">
+                      <Phone size={12} className="text-gold-primary/40" />
+                      {order.phone}
+                    </div>
+                    <div className="flex items-start gap-2 max-w-xs">
+                      <MapPin size={12} className="text-gold-primary/40 flex-shrink-0 mt-0.5" />
+                      {order.address}
+                    </div>
+                  </div>
+
+                  <div className="py-2 border-t border-gold-primary/5">
+                    {order.items?.map((item: any, i: number) => (
+                      <p key={i} className="text-[11px] text-foreground/70">
+                        {item.name} <span className="text-gold-primary font-bold">x{item.quantity}</span>
+                      </p>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-gold-primary/5">
+                    <div className="flex flex-col">
+                      <p className="text-[9px] uppercase tracking-widest text-foreground/30 font-bold">UPI Last 4</p>
+                      <p className="text-xs font-mono font-bold text-gold-primary">{order.upiLast4 || "N/A"}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[9px] uppercase tracking-widest text-foreground/30 font-bold">Total</p>
+                      <p className="text-sm font-bold text-gold-primary">₹{order.totalPrice}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    {order.status === "Pending" && (
+                      <button onClick={() => updateStatus(order._id, "Processing")} className="flex-1 py-2 bg-blue-50 text-blue-500 border border-blue-100 flex justify-center"><Clock size={16} /></button>
+                    )}
+                    {order.status === "Processing" && (
+                      <button onClick={() => updateStatus(order._id, "Shipped")} className="flex-1 py-2 bg-purple-50 text-purple-500 border border-purple-100 flex justify-center"><Truck size={16} /></button>
+                    )}
+                    {order.status === "Shipped" && (
+                      <button onClick={() => updateStatus(order._id, "Completed")} className="flex-1 py-2 bg-green-50 text-green-500 border border-green-100 flex justify-center"><CheckCircle2 size={16} /></button>
+                    )}
+                    <button onClick={() => updateStatus(order._id, "Cancelled")} className="flex-1 py-2 bg-red-50 text-red-500 border border-red-100 flex justify-center"><XCircle size={16} /></button>
+                    <button onClick={() => deleteOrder(order._id)} className="p-2 text-red-600 bg-red-50 border border-red-100"><Trash2 size={16} /></button>
+                  </div>
+                </div>
+              )) : (
+                <div className="p-10 text-center text-foreground/30 italic">No orders found.</div>
+              )}
+            </div>
+
+            {/* Desktop View: Table */}
+            <div className="hidden md:block overflow-x-auto scrollbar-thin scrollbar-thumb-gold-primary/20">
+              <table className="w-full text-left border-collapse min-w-[1000px]">
+                <thead>
+                  <tr className="bg-[#FAF9F6] border-b border-gold-primary/10">
+                  <th className="p-6 text-[10px] uppercase tracking-[0.2em] font-bold text-gold-primary">Order Date</th>
+                  <th className="p-6 text-[10px] uppercase tracking-[0.2em] font-bold text-gold-primary">Customer Details</th>
+                  <th className="p-6 text-[10px] uppercase tracking-[0.2em] font-bold text-gold-primary">Items</th>
+                  <th className="p-6 text-[10px] uppercase tracking-[0.2em] font-bold text-gold-primary">Transaction (UPI 4)</th>
+                  <th className="p-6 text-[10px] uppercase tracking-[0.2em] font-bold text-gold-primary">Total Price</th>
+                  <th className="p-6 text-[10px] uppercase tracking-[0.2em] font-bold text-gold-primary">Status</th>
+                  <th className="p-6 text-[10px] uppercase tracking-[0.2em] font-bold text-gold-primary">Actions</th>
+                </tr>
+              </thead>
             <tbody className="divide-y divide-gold-primary/5">
               {orders.map((order) => (
                 <tr key={order._id} className="hover:bg-gold-soft/5 transition-colors">
