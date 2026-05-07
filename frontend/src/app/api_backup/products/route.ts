@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     };
 
     // Handle Image Uploads
-    const images = formData.getAll('images') as File[];
+    const images = formData.getAll('images') as (File | string)[];
     const imageUrls: string[] = [];
 
     if (images && images.length > 0) {

@@ -3,13 +3,17 @@ import connectDB from '@/lib/mongodb';
 import Order from '@/models/Order';
 
 // PATCH /api/orders/[id] - Update order status (Admin)
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     await connectDB();
     const { status } = await req.json();
+    const { id } = await params;
     
     const updatedOrder = await Order.findByIdAndUpdate(
-      params.id,
+      id,
       { status },
       { new: true }
     );
@@ -25,10 +29,14 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 // DELETE /api/orders/[id] - Delete order (Admin)
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  req: NextRequest,
+  context: RouteContext<'/api_backup/orders/[id]'>
+) {
   try {
     await connectDB();
-    const order = await Order.findByIdAndDelete(params.id);
+    const { id } = await context.params;
+    const order = await Order.findByIdAndDelete(id);
     if (!order) {
       return NextResponse.json({ message: 'Order not found' }, { status: 404 });
     }

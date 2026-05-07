@@ -4,10 +4,14 @@ import Product from '@/models/Product';
 import cloudinary from '@/lib/cloudinary';
 
 // GET /api/products/[id] - Get single product
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  req: NextRequest,
+  context: RouteContext<'/api_backup/products/[id]'>
+) {
   try {
     await connectDB();
-    const product = await Product.findById(params.id);
+    const { id } = await context.params;
+    const product = await Product.findById(id);
     if (!product) {
       return NextResponse.json({ message: 'Product not found' }, { status: 404 });
     }
@@ -18,9 +22,13 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 }
 
 // PUT /api/products/[id] - Update product (Admin)
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  req: NextRequest,
+  context: RouteContext<'/api_backup/products/[id]'>
+) {
   try {
     await connectDB();
+    const { id } = await context.params;
     const formData = await req.formData();
     
     const updateData: any = {};
@@ -82,7 +90,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       }
     }
 
-    const updatedProduct = await Product.findByIdAndUpdate(params.id, updateData, { new: true });
+    const updatedProduct = await Product.findByIdAndUpdate(id, updateData, { new: true });
     if (!updatedProduct) {
       return NextResponse.json({ message: 'Product not found' }, { status: 404 });
     }
@@ -94,10 +102,14 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 // DELETE /api/products/[id] - Delete product (Admin)
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  req: NextRequest,
+  context: RouteContext<'/api_backup/products/[id]'>
+) {
   try {
     await connectDB();
-    const product = await Product.findByIdAndDelete(params.id);
+    const { id } = await context.params;
+    const product = await Product.findByIdAndDelete(id);
     if (!product) {
       return NextResponse.json({ message: 'Product not found' }, { status: 404 });
     }
