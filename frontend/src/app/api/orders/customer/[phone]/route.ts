@@ -4,11 +4,11 @@ import Order from '@/models/Order';
 
 export async function GET(
   req: NextRequest,
-  context: RouteContext<'/api_backup/orders/customer/[phone]'>
+  { params }: { params: Promise<{ phone: string }> }
 ) {
   try {
     await connectDB();
-    const { phone } = await context.params;
+    const { phone } = await params;
     
     // Find orders by phone, populating product details
     const orders = await Order.find({ phone })

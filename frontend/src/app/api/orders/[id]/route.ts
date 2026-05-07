@@ -31,11 +31,11 @@ export async function PATCH(
 // DELETE /api/orders/[id] - Delete order (Admin)
 export async function DELETE(
   req: NextRequest,
-  context: RouteContext<'/api_backup/orders/[id]'>
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
-    const { id } = await context.params;
+    const { id } = await params;
     const order = await Order.findByIdAndDelete(id);
     if (!order) {
       return NextResponse.json({ message: 'Order not found' }, { status: 404 });
