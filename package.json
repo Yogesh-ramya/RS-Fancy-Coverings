@@ -1,20 +1,20 @@
 {
-  "name": "jewelry-fullstack",
+  "name": "rs-fancy-coverings",
   "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "scripts": {
-    "install-all": "npm install && cd jewelry-project/backend && npm install && cd ../frontend && npm install",
-    "dev-backend": "cd jewelry-project/backend && npm run dev",
-    "dev-frontend": "cd jewelry-project/frontend && npm run dev",
-    "dev": "concurrently \"npm run dev-backend\" \"npm run dev-frontend\""
+    "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
+    "build": "npm run build --workspace=frontend",
+    "start": "concurrently \"npm start --workspace=backend\" \"npm start --workspace=frontend\"",
+    "install-all": "npm install",
+    "backend": "npm run dev --workspace=backend",
+    "frontend": "npm run dev --workspace=frontend"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
-  },
-  "dependencies": {
-    "cloudinary": "^1.41.3",
-    "multer": "^2.1.1",
-    "multer-storage-cloudinary": "^4.0.0",
-    "react": "^19.2.4",
-    "tailwindcss": "^4.2.2"
   }
 }

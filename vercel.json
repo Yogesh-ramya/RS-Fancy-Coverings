@@ -1,4 +1,12 @@
 {
-  "framework": "nextjs",
-  "rootDirectory": "jewelry-project/frontend"
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "http://localhost:5000/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/$1"
+    }
+  ]
 }
