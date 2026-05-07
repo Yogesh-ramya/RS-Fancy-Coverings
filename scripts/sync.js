@@ -1,4 +1,5 @@
-const { execSync } = require('child_process');
+import { execSync } from 'child_process';
+import process from 'process';
 
 try {
   // 1. Add all changes
