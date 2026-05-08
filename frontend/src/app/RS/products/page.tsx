@@ -14,6 +14,8 @@ import {
 import Link from "next/link";
 
 import { API_BASE_URL } from "@/config/apiConfig";
+import Image from "next/image";
+import SkeletonCard from "@/components/SkeletonCard";
 
 export default function ProductsAdmin() {
   const [products, setProducts] = useState<any[]>([]);
@@ -110,21 +112,28 @@ export default function ProductsAdmin() {
         </div>
       </header>
 
-      {loading ? (
-        <div className="py-20 text-center font-premium text-xl text-foreground/20 italic">Loading your collection...</div>
-      ) : (
+
         <div className="bg-white border border-gold-primary/10 shadow-sm overflow-hidden">
           {/* Mobile View: Grid */}
           <div className="md:hidden grid grid-cols-2 gap-px bg-gold-primary/10">
-            {filteredProducts.length > 0 ? filteredProducts.map((product) => (
+            {loading ? (
+              [...Array(4)].map((_, i) => (
+                <div key={i} className="bg-white p-4">
+                  <div className="aspect-[3/4] bg-gold-soft/10 animate-pulse mb-3" />
+                  <div className="h-3 bg-gold-soft/10 animate-pulse w-3/4 mb-2" />
+                  <div className="h-3 bg-gold-soft/10 animate-pulse w-1/2" />
+                </div>
+              ))
+            ) : filteredProducts.length > 0 ? filteredProducts.map((product) => (
               <div key={product._id} className="bg-white flex flex-col p-4 space-y-3 hover:bg-gold-soft/5 transition-colors">
                 <div className="aspect-[3/4] bg-gold-soft/20 overflow-hidden relative group">
-                  <img 
+                  <Image 
                     src={product.images?.[0] || "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=200"} 
                     alt={product.name_en} 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-500" 
                   />
-                  <div className="absolute top-2 right-2">
+                  <div className="absolute top-2 right-2 z-10">
                      <span className={`text-[8px] font-bold uppercase tracking-widest px-1.5 py-0.5 shadow-sm border ${product.stock <= 5 ? 'bg-red-50 text-red-500 border-red-100' : 'bg-white/90 text-gold-primary border-gold-primary/20'}`}>
                         {product.stock} left
                      </span>
@@ -170,14 +179,31 @@ export default function ProductsAdmin() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gold-primary/5">
-                {filteredProducts.length > 0 ? filteredProducts.map((product) => (
+                {loading ? (
+                  [...Array(5)].map((_, i) => (
+                    <tr key={i} className="animate-pulse">
+                      <td className="p-6 flex items-center gap-4">
+                        <div className="w-12 h-16 bg-gold-soft/10 shrink-0" />
+                        <div className="space-y-2 w-full">
+                          <div className="h-3 bg-gold-soft/10 w-3/4" />
+                          <div className="h-2 bg-gold-soft/10 w-1/2" />
+                        </div>
+                      </td>
+                      <td className="p-6"><div className="h-4 bg-gold-soft/10 w-20" /></td>
+                      <td className="p-6"><div className="h-4 bg-gold-soft/10 w-16" /></td>
+                      <td className="p-6"><div className="h-4 bg-gold-soft/10 w-24" /></td>
+                      <td className="p-6"><div className="h-8 bg-gold-soft/10 w-24" /></td>
+                    </tr>
+                  ))
+                ) : filteredProducts.length > 0 ? filteredProducts.map((product) => (
                   <tr key={product._id} className="hover:bg-gold-soft/5 transition-colors">
                     <td className="p-6 flex items-center gap-4">
-                      <div className="w-12 h-16 bg-gold-soft/20 flex-shrink-0">
-                        <img 
+                      <div className="w-12 h-16 bg-gold-soft/20 flex-shrink-0 relative">
+                        <Image 
                           src={product.images?.[0] || "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=200"} 
                           alt={product.name_en} 
-                          className="w-full h-full object-cover" 
+                          fill
+                          className="object-cover" 
                         />
                       </div>
                       <div>
@@ -239,7 +265,6 @@ export default function ProductsAdmin() {
             </table>
           </div>
         </div>
-      )}
     </div>
   );
 }

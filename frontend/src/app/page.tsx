@@ -90,6 +90,7 @@ const SortDropdown = ({ sortBy, setSortBy, t }: { sortBy: string; setSortBy: (v:
 };
 
 import { API_BASE_URL } from "@/config/apiConfig";
+import SkeletonCard from "@/components/SkeletonCard";
 
 function HomeContent() {
   const { t } = useLanguage();
@@ -112,7 +113,7 @@ function HomeContent() {
       } catch (err) {
         console.error("Fetch error:", err);
       } finally {
-        setLoading(false);
+        setTimeout(() => setLoading(false), 500); // Small delay for smooth transition
       }
     };
     fetchProducts();
@@ -237,8 +238,10 @@ function HomeContent() {
 
         {/* Product Grid */}
         {loading ? (
-          <div className="py-20 text-center font-premium text-2xl text-foreground/20 italic animate-pulse tracking-widest">
-            {t("collectionLoading") || "Revealing our latest collection..."}
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
+            {[...Array(8)].map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
           </div>
         ) : filteredProducts.length === 0 ? (
           <div className="py-20 text-center">

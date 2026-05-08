@@ -5,6 +5,8 @@ import { ShoppingCart, MessageCircle, AlertCircle, Maximize2 } from "lucide-reac
 import { motion } from "framer-motion";
 import ProductModal from "./ProductModal";
 
+import Image from "next/image";
+
 interface ProductCardProps {
   product: {
     _id: string;
@@ -45,10 +47,13 @@ export default function ProductCard({ product }: ProductCardProps) {
           onClick={() => setIsModalOpen(true)}
           className="relative aspect-[4/5] overflow-hidden bg-gold-soft/20 cursor-pointer"
         >
-          <img
+          <Image
             src={product.images?.[0] || "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=800"}
             alt={name}
-            className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110"
+            fill
+            sizes="(max-width: 768px) 50vw, 25vw"
+            className="object-cover transition-transform duration-700 group-hover:scale-110"
+            priority={false}
           />
           
           {/* Hover Overlay */}

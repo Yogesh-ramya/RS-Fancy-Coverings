@@ -19,6 +19,7 @@ export default function AdminDashboard() {
     lowStock: 0,
     newCustomers: 0
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Fetch background stats (Simulation for now)
@@ -40,6 +41,8 @@ export default function AdminDashboard() {
         });
       } catch (err) {
         console.error("Stats error:", err);
+      } finally {
+        setLoading(false);
       }
     };
     fetchStats();
@@ -62,7 +65,20 @@ export default function AdminDashboard() {
       </header>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
-        {cards.map((card, i) => (
+        {loading ? (
+          [...Array(4)].map((_, i) => (
+            <div key={i} className="bg-white p-6 sm:p-8 border border-gold-primary/10 shadow-sm animate-pulse">
+              <div className="flex justify-between">
+                <div className="w-10 h-10 bg-gold-soft/10" />
+                <div className="w-4 h-4 bg-gold-soft/10" />
+              </div>
+              <div className="mt-8">
+                <div className="h-2 bg-gold-soft/10 w-20 mb-2" />
+                <div className="h-8 bg-gold-soft/10 w-24" />
+              </div>
+            </div>
+          ))
+        ) : cards.map((card, i) => (
           <motion.div
             key={card.label}
             initial={{ opacity: 0, y: 20 }}

@@ -6,6 +6,8 @@ import { useCart } from "@/context/CartContext";
 import { ShoppingCart, MessageCircle, X, Check, XCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+import Image from "next/image";
+
 interface ProductModalProps {
   product: {
     _id: string;
@@ -72,15 +74,18 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
 
             {/* Left Side: Images */}
             <div className="w-full md:w-1/2 bg-gold-soft/10 flex flex-col shrink-0">
-              <div className="flex-grow flex items-center justify-center p-6 sm:p-12 min-h-[40vh] sm:min-h-[300px]">
-                <motion.img
-                  key={selectedImage}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  src={images[selectedImage]}
-                  alt={name}
-                  className="max-w-full max-h-[350px] sm:max-h-[400px] object-contain shadow-lg"
-                />
+              <div className="flex-grow flex items-center justify-center p-6 sm:p-12 min-h-[40vh] sm:min-h-[300px] relative">
+                <div className="relative w-full h-[350px] sm:h-[400px]">
+                  <Image
+                    key={selectedImage}
+                    src={images[selectedImage]}
+                    alt={name}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-contain drop-shadow-xl"
+                    priority
+                  />
+                </div>
               </div>
               
               {/* Thumbnails */}
@@ -90,11 +95,16 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
                     <button
                       key={idx}
                       onClick={() => setSelectedImage(idx)}
-                      className={`w-16 h-16 border-2 transition-all ${
+                      className={`relative w-16 h-16 border-2 transition-all shrink-0 ${
                         selectedImage === idx ? "border-gold-primary" : "border-transparent opacity-60 hover:opacity-100"
                       }`}
                     >
-                      <img src={img} alt={`${name} ${idx}`} className="w-full h-full object-cover" />
+                      <Image 
+                        src={img} 
+                        alt={`${name} ${idx}`} 
+                        fill 
+                        className="object-cover" 
+                      />
                     </button>
                   ))}
                 </div>

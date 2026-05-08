@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { translateText } from "@/utils/translate";
+
 
 import { API_BASE_URL } from "@/config/apiConfig";
 
@@ -50,6 +52,23 @@ export default function NewProductAdmin() {
     // Create previews
     const newPreviews = files.map(file => URL.createObjectURL(file));
     setPreviews(newPreviews);
+  };
+
+  const handleAutoTranslate = async (field: 'name' | 'description', sourceLang: 'en' | 'ta') => {
+    const targetLang = sourceLang === 'en' ? 'ta' : 'en';
+    const sourceValue = formData[`${field}_${sourceLang}` as keyof typeof formData] as string;
+    const targetValue = formData[`${field}_${targetLang}` as keyof typeof formData] as string;
+
+    // Only translate if source has value and target is empty
+    if (sourceValue && !targetValue) {
+      const translated = await translateText(sourceValue, sourceLang, targetLang);
+      if (translated) {
+        setFormData(prev => ({
+          ...prev,
+          [`${field}_${targetLang}`]: translated
+        }));
+      }
+    }
   };
 
   const handleCropSave = () => {
@@ -179,6 +198,7 @@ export default function NewProductAdmin() {
                   className="w-full p-4 bg-background border border-gold-primary/10 text-sm focus:border-gold-primary outline-none transition-all"
                   value={formData.name_en}
                   onChange={(e) => setFormData({...formData, name_en: e.target.value})}
+                  onBlur={() => handleAutoTranslate('name', 'en')}
                 />
               </div>
               <div className="space-y-4">
@@ -190,6 +210,7 @@ export default function NewProductAdmin() {
                   className="w-full p-4 bg-background border border-gold-primary/10 text-sm focus:border-gold-primary outline-none transition-all"
                   value={formData.name_ta}
                   onChange={(e) => setFormData({...formData, name_ta: e.target.value})}
+                  onBlur={() => handleAutoTranslate('name', 'ta')}
                 />
               </div>
             </div>
@@ -201,6 +222,7 @@ export default function NewProductAdmin() {
                 className="w-full p-4 bg-background border border-gold-primary/10 text-sm focus:border-gold-primary outline-none transition-all"
                 value={formData.description_en}
                 onChange={(e) => setFormData({...formData, description_en: e.target.value})}
+                onBlur={() => handleAutoTranslate('description', 'en')}
               />
             </div>
             
@@ -212,6 +234,7 @@ export default function NewProductAdmin() {
                 className="w-full p-4 bg-background border border-gold-primary/10 text-sm focus:border-gold-primary outline-none transition-all"
                 value={formData.description_ta}
                 onChange={(e) => setFormData({...formData, description_ta: e.target.value})}
+                onBlur={() => handleAutoTranslate('description', 'ta')}
               />
             </div>
           </div>

@@ -91,13 +91,23 @@ export default function OrdersAdmin() {
         </div>
       </header>
 
-      {loading ? (
-        <div className="py-20 text-center font-premium text-xl text-foreground/20 italic">Loading your orders...</div>
-      ) : (
         <div className="bg-white border border-gold-primary/10 shadow-sm overflow-hidden">
             {/* Mobile View: Order Cards */}
             <div className="md:hidden divide-y divide-gold-primary/5 bg-white">
-              {orders.length > 0 ? orders.map((order) => (
+              {loading ? (
+                [...Array(3)].map((_, i) => (
+                  <div key={i} className="p-6 space-y-4 animate-pulse">
+                    <div className="flex justify-between">
+                      <div className="space-y-2 w-1/2">
+                        <div className="h-4 bg-gold-soft/10 rounded w-full" />
+                        <div className="h-2 bg-gold-soft/10 rounded w-1/3" />
+                      </div>
+                      <div className="h-4 bg-gold-soft/10 rounded w-20" />
+                    </div>
+                    <div className="h-10 bg-gold-soft/5 rounded w-full" />
+                  </div>
+                ))
+              ) : orders.length > 0 ? orders.map((order) => (
                 <div key={order._id} className="p-6 space-y-4 hover:bg-gold-soft/5 transition-colors">
                   <div className="flex justify-between items-start">
                     <div className="space-y-1">
@@ -173,7 +183,19 @@ export default function OrdersAdmin() {
                 </tr>
               </thead>
             <tbody className="divide-y divide-gold-primary/5">
-              {orders.map((order) => (
+              {loading ? (
+                [...Array(5)].map((_, i) => (
+                  <tr key={i} className="animate-pulse">
+                    <td className="p-6"><div className="h-3 bg-gold-soft/10 w-20" /></td>
+                    <td className="p-6"><div className="h-12 bg-gold-soft/10 w-full" /></td>
+                    <td className="p-6"><div className="h-8 bg-gold-soft/10 w-full" /></td>
+                    <td className="p-6"><div className="h-6 bg-gold-soft/10 w-24" /></td>
+                    <td className="p-6"><div className="h-4 bg-gold-soft/10 w-16" /></td>
+                    <td className="p-6"><div className="h-4 bg-gold-soft/10 w-20" /></td>
+                    <td className="p-6"><div className="h-8 bg-gold-soft/10 w-32" /></td>
+                  </tr>
+                ))
+              ) : orders.map((order) => (
                 <tr key={order._id} className="hover:bg-gold-soft/5 transition-colors">
                   <td className="p-6 text-xs text-foreground/60 align-top">
                     {new Date(order.createdAt).toLocaleDateString("en-IN", {
@@ -272,7 +294,6 @@ export default function OrdersAdmin() {
             </table>
           </div>
         </div>
-      )}
     </div>
   );
 }

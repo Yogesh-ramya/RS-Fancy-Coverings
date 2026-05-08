@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import { Trash2, Plus, Minus, ArrowRight, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 export default function CartPage() {
   const { cartItems, updateQuantity, removeFromCart, totalAmount, deliveryCharge, totalWithDelivery, itemCount } = useCart();
@@ -58,11 +59,12 @@ export default function CartPage() {
                   exit={{ opacity: 0, x: 20 }}
                   className="flex flex-col sm:flex-row items-center gap-6 p-4 bg-white border border-gold-primary/10 relative group"
                 >
-                  <div className="w-full sm:w-24 h-64 sm:h-32 bg-gold-soft/20 flex-shrink-0 overflow-hidden">
-                    <img 
+                  <div className="w-full sm:w-24 h-64 sm:h-32 bg-gold-soft/20 flex-shrink-0 overflow-hidden relative">
+                    <Image 
                       src={(item.images && item.images[0]) || item.image || "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=400"} 
                       alt={language === "en" ? item.name_en : item.name_ta} 
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-110" 
                     />
                   </div>
 
