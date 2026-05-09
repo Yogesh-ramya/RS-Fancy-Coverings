@@ -84,14 +84,20 @@ export default function AuthModal() {
           throw new Error("Please enter your email or phone number.");
         }
         
-        // For forgot password, we can still use a simplified check or a real route if you want
-        // For now, let's keep it as a UI simulation as requested in the previous prompt
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setSuccess("A recovery link has been sent to your provided details.");
+        const response = await fetch("/api/auth/forgot-password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ identifier })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || "Failed to process request");
+
+        setSuccess(data.message);
         setTimeout(() => {
           setView("login");
           setSuccess("");
-        }, 3000);
+        }, 5000);
       }
     } catch (err: any) {
       setError(err.message || "Something went wrong.");
