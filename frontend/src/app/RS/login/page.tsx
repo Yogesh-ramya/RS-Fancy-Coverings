@@ -3,11 +3,12 @@
 import React, { useState, useEffect } from "react";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 import { useRouter } from "next/navigation";
-import { Lock, User, ShieldCheck, AlertCircle } from "lucide-react";
+import { Lock, User, ShieldCheck, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const { login, isAdmin } = useAdminAuth();
   const router = useRouter();
@@ -58,13 +59,20 @@ export default function AdminLoginPage() {
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gold-primary/40" size={18} />
                 <input 
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   required
                   placeholder="••••••••"
-                  className="w-full pl-12 pr-4 py-4 bg-background border border-gold-primary/10 text-sm focus:border-gold-primary outline-none transition-all"
+                  className="w-full pl-12 pr-12 py-4 bg-background border border-gold-primary/10 text-sm focus:border-gold-primary outline-none transition-all"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gold-primary/40 hover:text-gold-primary transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
             </div>
 

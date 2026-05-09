@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Lock, Mail, Phone, X, ArrowRight, Loader2, KeyRound, CheckCircle2 } from "lucide-react";
+import { User, Lock, Mail, Phone, X, ArrowRight, Loader2, KeyRound, CheckCircle2, Eye, EyeOff } from "lucide-react";
 import { useUserAuth } from "@/context/UserAuthContext";
 import { usePathname } from "next/navigation";
 
@@ -14,6 +14,7 @@ export default function AuthModal() {
   
   const [view, setView] = useState<ViewState>("login");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -221,17 +222,24 @@ export default function AuthModal() {
                 </motion.div>
               )}
 
-              {view === "login" && (
+              {(view === "login" || view === "signup") && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative">
                   <Lock className={iconClasses} />
                   <input 
-                    type="password" 
+                    type={showPassword ? "text" : "password"} 
                     placeholder="Password" 
                     value={password} 
                     onChange={e => setPassword(e.target.value)} 
                     className={inputClasses} 
                     required 
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-all"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </motion.div>
               )}
 
@@ -239,13 +247,20 @@ export default function AuthModal() {
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative">
                   <Lock className={iconClasses} />
                   <input 
-                    type="password" 
+                    type={showPassword ? "text" : "password"} 
                     placeholder="New Password" 
                     value={newPassword} 
                     onChange={e => setNewPassword(e.target.value)} 
                     className={inputClasses} 
                     required 
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-all"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </motion.div>
               )}
 
