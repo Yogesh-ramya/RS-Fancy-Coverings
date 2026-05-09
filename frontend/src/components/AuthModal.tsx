@@ -59,7 +59,7 @@ export default function AuthModal() {
         const data = await response.json();
         if (!response.ok) throw new Error(data.message || "Signup failed");
 
-        login({ name: data.user.username, email: data.user.email });
+        login({ name: data.user.username, email: data.user.email, phone: data.user.phone });
         setSuccess("Account created successfully!");
         
       } else if (view === "login") {
@@ -76,7 +76,7 @@ export default function AuthModal() {
         const data = await response.json();
         if (!response.ok) throw new Error(data.message || "Login failed");
 
-        login({ name: data.user.username, email: data.user.email });
+        login({ name: data.user.username, email: data.user.email, phone: data.user.phone });
         setSuccess("Logged in successfully!");
         
       } else if (view === "forgot") {

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 interface UserInfo {
   name: string;
   email: string;
+  phone: string;
   avatar?: string;
 }
 

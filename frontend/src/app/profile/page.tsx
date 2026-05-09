@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
-import { User, Phone, MapPin, Hash, Flag, ShoppingBag, Clock, CheckCircle, Truck, Package, XCircle, Plus } from "lucide-react";
+import { User, Phone, MapPin, Hash, Flag, ShoppingBag, Clock, CheckCircle, Truck, Package, XCircle, Plus, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { API_BASE_URL } from "@/config/apiConfig";
+import { useUserAuth } from "@/context/UserAuthContext";
 
 interface OrderItem {
   productId: any;
@@ -27,6 +28,7 @@ interface Order {
 }
 
 export default function ProfilePage() {
+  const { user, logout: authLogout } = useUserAuth();
   const [userDetails, setUserDetails] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editFormData, setEditFormData] = useState<any>(null);
@@ -35,21 +37,38 @@ export default function ProfilePage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    // 1. Priority: Use locally saved shipping details
     const savedData = localStorage.getItem("rs_shipping_details");
+    
     if (savedData) {
       try {
         const parsed = JSON.parse(savedData);
         setUserDetails(parsed);
         setEditFormData(parsed);
         fetchOrders(parsed.phone);
+        return;
       } catch (e) {
         console.error("Error parsing saved data:", e);
-        setLoading(false);
       }
+    }
+
+    // 2. Secondary: Use account details from login/signup
+    if (user) {
+      const basicData = {
+        customerName: user.name,
+        email: user.email,
+        phone: user.phone,
+        address: "",
+        pincode: "",
+        landmark: ""
+      };
+      setUserDetails(basicData);
+      setEditFormData(basicData);
+      fetchOrders(user.phone);
     } else {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   const handleSaveDetails = () => {
     if (!editFormData.customerName || !editFormData.phone || !editFormData.address) {
@@ -92,6 +111,14 @@ export default function ProfilePage() {
     }
   };
 
+  const handleLogout = () => {
+    if (window.confirm("Are you sure you want to log out from your luxury account?")) {
+      authLogout();
+      localStorage.removeItem("rs_shipping_details");
+      window.location.href = "/";
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -109,9 +136,17 @@ export default function ProfilePage() {
       <Navbar />
       
       <div className="max-w-6xl mx-auto pt-32 px-4 sm:px-6 lg:px-8">
-        <div className="mb-12 border-b border-gold-primary/10 pb-8">
-          <h1 className="text-4xl md:text-5xl font-premium font-bold tracking-tight mb-2">My Profile</h1>
-          <p className="text-[10px] uppercase tracking-[0.5em] text-gold-primary font-bold opacity-60">Personal Boutique & History</p>
+        <div className="mb-12 border-b border-gold-primary/10 pb-8 flex justify-between items-end">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-premium font-bold tracking-tight mb-2">My Profile</h1>
+            <p className="text-[10px] uppercase tracking-[0.5em] text-gold-primary font-bold opacity-60">Personal Boutique & History</p>
+          </div>
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-4 py-2 text-[10px] uppercase tracking-widest font-bold text-red-500 border border-red-100 hover:bg-red-50 transition-all mb-1"
+          >
+            <LogOut size={14} /> Sign Out
+          </button>
         </div>
 
         {!userDetails ? (
@@ -238,7 +273,7 @@ export default function ProfilePage() {
                       <label className="text-[9px] uppercase tracking-widest text-foreground/40 font-bold block mb-1">Default Address</label>
                       <div className="flex items-start gap-2 text-sm leading-relaxed border-b border-gold-primary/5 pb-2 group-hover:border-gold-primary/30 transition-colors">
                         <MapPin size={14} className="text-gold-primary/40 mt-1 flex-shrink-0" />
-                        {userDetails.address}
+                        {userDetails.address || <span className="italic text-foreground/20">Not set</span>}
                       </div>
                     </div>
 
@@ -247,7 +282,7 @@ export default function ProfilePage() {
                         <label className="text-[9px] uppercase tracking-widest text-foreground/40 font-bold block mb-1">Pincode</label>
                         <div className="flex items-center gap-2 text-sm font-sans border-b border-gold-primary/5 pb-2 group-hover:border-gold-primary/30 transition-colors">
                           <Hash size={14} className="text-gold-primary/40" />
-                          {userDetails.pincode}
+                          {userDetails.pincode || "---"}
                         </div>
                       </div>
                       <div className="group">
@@ -261,19 +296,9 @@ export default function ProfilePage() {
                   </div>
                 )}
 
-                <div className="mt-10 pt-6 border-t border-gold-primary/10">
-                  <p className="text-[10px] text-foreground/30 italic text-center leading-relaxed">
-                    These details are saved locally for your convenience. They will be pre-filled on your next checkout.
-                  </p>
-                  <button 
-                    onClick={() => {
-                      localStorage.removeItem("rs_shipping_details");
-                      window.location.reload();
-                    }}
-                    className="w-full mt-4 py-3 border border-gold-primary/20 text-gold-primary text-[10px] uppercase tracking-widest font-bold hover:bg-gold-soft/10 transition-all"
-                  >
-                    Forget my details
-                  </button>
+                <div className="mt-10 pt-6 border-t border-gold-primary/10 text-center">
+                   <p className="text-[9px] uppercase tracking-widest text-foreground/30 font-bold mb-4">Member Since</p>
+                   <p className="text-xs font-sans text-gold-primary font-bold">{new Date().toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}</p>
                 </div>
               </div>
             </div>
@@ -290,7 +315,7 @@ export default function ProfilePage() {
               {orders.length === 0 ? (
                 <div className="p-20 text-center bg-white border border-gold-primary/10 shadow-sm">
                   <ShoppingBag size={40} className="mx-auto text-gold-primary/10 mb-4" />
-                  <p className="text-foreground/40 uppercase tracking-widest text-[11px] font-bold">No orders found for this number yet.</p>
+                  <p className="text-foreground/40 uppercase tracking-widest text-[11px] font-bold">No orders found for this account yet.</p>
                 </div>
               ) : (
                 <div className="space-y-6">
