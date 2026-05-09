@@ -1,14 +1,12 @@
 const multer = require('multer');
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinaryStorage = require('multer-storage-cloudinary');
 const cloudinary = require('../config/cloudinary');
 
-const storage = new CloudinaryStorage({
+const storage = cloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: 'jewelry-products',
-    allowed_formats: ['jpg', 'png', 'jpeg'],
-    transformation: [{ width: 800, height: 1000, crop: 'limit' }]
-  },
+  folder: 'jewelry-products',
+  allowedFormats: ['jpg', 'png', 'jpeg'],
+  transformation: [{ width: 800, height: 1000, crop: 'limit' }]
 });
 
 const upload = multer({ 
