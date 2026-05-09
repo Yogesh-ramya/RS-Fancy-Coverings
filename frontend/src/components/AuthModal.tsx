@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Lock, Mail, Phone, X, ArrowRight, Loader2, KeyRound } from "lucide-react";
+import { User, Lock, Mail, Phone, X, ArrowRight, Loader2, KeyRound, CheckCircle2 } from "lucide-react";
 import { useUserAuth } from "@/context/UserAuthContext";
 import { usePathname } from "next/navigation";
 
-type ViewState = "login" | "signup" | "forgot";
+type ViewState = "login" | "signup" | "forgot" | "reset";
 
 export default function AuthModal() {
   const { showModal, dismissModal, login } = useUserAuth();
@@ -25,6 +25,7 @@ export default function AuthModal() {
   // Form states
   const [identifier, setIdentifier] = useState(""); // Username, Email, or Phone for login
   const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   
   // Signup specific
   const [username, setUsername] = useState("");
@@ -37,7 +38,6 @@ export default function AuthModal() {
     setSuccess("");
   }, [view]);
 
-  // Mock API Call
   const handleAction = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -93,11 +93,33 @@ export default function AuthModal() {
         const data = await response.json();
         if (!response.ok) throw new Error(data.message || "Failed to process request");
 
-        setSuccess(data.message);
+        setSuccess("Account verified! Please set your new password.");
+        setTimeout(() => {
+          setView("reset");
+          setSuccess("");
+        }, 1500);
+
+      } else if (view === "reset") {
+        if (!newPassword) {
+          throw new Error("Please enter a new password.");
+        }
+
+        const response = await fetch("/api/auth/reset-password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ identifier, newPassword })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || "Reset failed");
+
+        setSuccess("Password updated! You can now log in.");
         setTimeout(() => {
           setView("login");
           setSuccess("");
-        }, 5000);
+          setIdentifier("");
+          setNewPassword("");
+        }, 2500);
       }
     } catch (err: any) {
       setError(err.message || "Something went wrong.");
@@ -134,7 +156,7 @@ export default function AuthModal() {
             </button>
 
             <div className="w-16 h-16 bg-gradient-to-tr from-gold-primary/20 to-gold-accent/20 rounded-full flex items-center justify-center mb-6 border border-gold-primary/20 shadow-[0_0_15px_rgba(212,175,55,0.2)]">
-              {view === "forgot" ? (
+              {view === "forgot" || view === "reset" ? (
                 <KeyRound className="w-7 h-7 text-gold-primary" />
               ) : (
                 <User className="w-7 h-7 text-gold-primary" />
@@ -142,14 +164,16 @@ export default function AuthModal() {
             </div>
 
             <h2 className="text-3xl font-premium tracking-wide text-white mb-2">
-              {view === "login" ? "Welcome Back" : view === "signup" ? "Create Account" : "Reset Password"}
+              {view === "login" ? "Welcome Back" : view === "signup" ? "Create Account" : view === "forgot" ? "Reset Password" : "New Password"}
             </h2>
             <p className="text-white/60 mb-8 font-light text-center text-sm px-4">
               {view === "login" 
                 ? "Enter your credentials to access your account." 
                 : view === "signup" 
                 ? "Join us to save favorites and track orders."
-                : "Enter your phone or email to recover your account."}
+                : view === "forgot"
+                ? "Enter your phone or email to recover your account."
+                : "Enter a strong new password for your account."}
             </p>
 
             <form onSubmit={handleAction} className="w-full space-y-4">
@@ -160,8 +184,8 @@ export default function AuthModal() {
                   </motion.div>
                 )}
                 {success && (
-                  <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-green-400 text-sm text-center bg-green-400/10 py-2 rounded-lg border border-green-400/20">
-                    {success}
+                  <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-green-400 text-sm text-center bg-green-400/10 py-2 rounded-lg border border-green-400/20 flex items-center justify-center gap-2">
+                    <CheckCircle2 size={14} /> {success}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -197,7 +221,7 @@ export default function AuthModal() {
                 </motion.div>
               )}
 
-              {view !== "forgot" && (
+              {view === "login" && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative">
                   <Lock className={iconClasses} />
                   <input 
@@ -205,6 +229,20 @@ export default function AuthModal() {
                     placeholder="Password" 
                     value={password} 
                     onChange={e => setPassword(e.target.value)} 
+                    className={inputClasses} 
+                    required 
+                  />
+                </motion.div>
+              )}
+
+              {view === "reset" && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative">
+                  <Lock className={iconClasses} />
+                  <input 
+                    type="password" 
+                    placeholder="New Password" 
+                    value={newPassword} 
+                    onChange={e => setNewPassword(e.target.value)} 
                     className={inputClasses} 
                     required 
                   />
@@ -226,7 +264,7 @@ export default function AuthModal() {
               >
                 {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
                   <>
-                    {view === "login" ? "Sign In" : view === "signup" ? "Create Account" : "Reset Password"}
+                    {view === "login" ? "Sign In" : view === "signup" ? "Create Account" : view === "forgot" ? "Verify Account" : "Update Password"}
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
