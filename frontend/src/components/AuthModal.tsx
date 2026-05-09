@@ -45,61 +45,53 @@ export default function AuthModal() {
     setSuccess("");
 
     try {
-      // Get mock database from localStorage
-      const usersRaw = localStorage.getItem("rs_mock_users");
-      const users: any[] = usersRaw ? JSON.parse(usersRaw) : [];
-
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network latency
-
       if (view === "signup") {
         if (!username || !email || !phone || !password) {
           throw new Error("Please fill all fields.");
         }
         
-        // Check if user already exists
-        const exists = users.find(u => u.email === email || u.phone === phone || u.username === username);
-        if (exists) {
-          throw new Error("User with this email, phone, or username already exists. Please login.");
-        }
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, email, phone, password })
+        });
 
-        const newUser = { username, email, phone, password };
-        users.push(newUser);
-        localStorage.setItem("rs_mock_users", JSON.stringify(users));
-        
-        login({ name: username, email });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || "Signup failed");
+
+        login({ name: data.user.username, email: data.user.email });
+        setSuccess("Account created successfully!");
         
       } else if (view === "login") {
         if (!identifier || !password) {
           throw new Error("Please enter your credentials.");
         }
         
-        const user = users.find(u => 
-          (u.email === identifier || u.username === identifier || u.phone === identifier) && 
-          u.password === password
-        );
-        
-        if (!user) {
-          throw new Error("Invalid credentials. Please try again.");
-        }
-        
-        login({ name: user.username, email: user.email });
+        const response = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ identifier, password })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || "Login failed");
+
+        login({ name: data.user.username, email: data.user.email });
+        setSuccess("Logged in successfully!");
         
       } else if (view === "forgot") {
         if (!identifier) {
           throw new Error("Please enter your email or phone number.");
         }
         
-        const user = users.find(u => u.email === identifier || u.phone === identifier);
-        if (user) {
-          setSuccess("A recovery link has been sent to your provided details.");
-          // Reset form to login after success
-          setTimeout(() => {
-            setView("login");
-            setSuccess("");
-          }, 3000);
-        } else {
-          throw new Error("No account found with these details.");
-        }
+        // For forgot password, we can still use a simplified check or a real route if you want
+        // For now, let's keep it as a UI simulation as requested in the previous prompt
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setSuccess("A recovery link has been sent to your provided details.");
+        setTimeout(() => {
+          setView("login");
+          setSuccess("");
+        }, 3000);
       }
     } catch (err: any) {
       setError(err.message || "Something went wrong.");
