@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
     const body = await req.json();
-    const { productId, items, customerName, phone, address, orderType, paymentId, upiLast4, totalPrice, deliveryCharge } = body;
+    const { productId, items, customerName, phone, address, pincode, landmark, orderType, paymentId, upiLast4, totalPrice, deliveryCharge } = body;
 
     // Handle stock reduction
     if (items && items.length > 0) {
@@ -47,6 +47,8 @@ export async function POST(req: NextRequest) {
       customerName,
       phone,
       address,
+      pincode,
+      landmark,
       totalPrice,
       deliveryCharge: deliveryCharge || 0,
       orderType,

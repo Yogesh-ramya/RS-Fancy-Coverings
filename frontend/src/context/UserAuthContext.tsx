@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 interface UserInfo {
   name: string;
@@ -24,10 +25,15 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
   const [showModal, setShowModal] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
+  const pathname = usePathname();
+
   useEffect(() => {
     // Check local storage for user or dismissed state
     const storedUser = localStorage.getItem("rs_user");
     const isDismissed = localStorage.getItem("rs_auth_dismissed");
+    
+    // Don't show modal automatically on admin/RS routes
+    const isAdminRoute = pathname?.startsWith("/RS") || pathname?.startsWith("/admin");
 
     if (storedUser) {
       try {
@@ -35,8 +41,8 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
       } catch (e) {
         console.error("Failed to parse stored user", e);
       }
-    } else if (!isDismissed) {
-      // If no user and not dismissed, show modal after a short delay
+    } else if (!isDismissed && !isAdminRoute) {
+      // If no user, not dismissed, and not on admin route, show modal after a short delay
       const timer = setTimeout(() => {
         setShowModal(true);
       }, 1500);
@@ -46,7 +52,7 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
     }
     
     setIsInitialized(true);
-  }, []);
+  }, [pathname]);
 
   const login = (userData: UserInfo) => {
     setUser(userData);

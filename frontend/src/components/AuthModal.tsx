@@ -4,16 +4,23 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { User, Lock, Mail, Phone, X, ArrowRight, Loader2, KeyRound } from "lucide-react";
 import { useUserAuth } from "@/context/UserAuthContext";
+import { usePathname } from "next/navigation";
 
 type ViewState = "login" | "signup" | "forgot";
 
 export default function AuthModal() {
   const { showModal, dismissModal, login } = useUserAuth();
+  const pathname = usePathname();
   
   const [view, setView] = useState<ViewState>("login");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Don't render modal at all on admin pages
+  if (pathname?.startsWith("/RS") || pathname?.startsWith("/admin")) {
+    return null;
+  }
 
   // Form states
   const [identifier, setIdentifier] = useState(""); // Username, Email, or Phone for login
