@@ -48,6 +48,9 @@ export const metadata: Metadata = {
   },
 };
 
+import { UserAuthProvider } from "@/context/UserAuthContext";
+import AuthModal from "@/components/AuthModal";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -61,7 +64,10 @@ export default function RootLayout({
       <body className="min-h-full font-sans bg-background text-foreground">
         <LanguageProvider>
           <CartProvider>
-            {children}
+            <UserAuthProvider>
+              {children}
+              <AuthModal />
+            </UserAuthProvider>
           </CartProvider>
         </LanguageProvider>
       </body>

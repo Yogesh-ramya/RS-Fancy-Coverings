@@ -6,10 +6,12 @@ import { useCart } from "@/context/CartContext";
 import { ShoppingBag, Globe, Menu, X, User } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { useUserAuth } from "@/context/UserAuthContext";
 
 export default function Navbar() {
   const { language, setLanguage } = useLanguage();
   const { itemCount } = useCart();
+  const { user, setShowModal } = useUserAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navLinks = [
@@ -64,9 +66,15 @@ export default function Navbar() {
                 <Globe size={16} className="mr-1 hidden sm:block" />
                 {language === "en" ? "Tamil" : "English"}
               </button>
-              <Link href="/profile" className="text-foreground hover:text-gold-primary transition-colors">
-                <User size={22} />
-              </Link>
+              {user ? (
+                <Link href="/profile" className="text-foreground hover:text-gold-primary transition-colors">
+                  <User size={22} />
+                </Link>
+              ) : (
+                <button onClick={() => setShowModal(true)} className="text-foreground hover:text-gold-primary transition-colors">
+                  <User size={22} />
+                </button>
+              )}
               <Link href="/cart" className="relative text-foreground hover:text-gold-primary transition-colors">
                 <ShoppingBag size={22} />
                 {itemCount > 0 && (
@@ -128,13 +136,25 @@ export default function Navbar() {
                       {item.name}
                     </Link>
                   ))}
-                  <Link
-                      href="/profile"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="block text-lg uppercase tracking-[0.2em] font-medium hover:text-gold-primary transition-all py-1 hover:translate-x-3 duration-300 border-l-2 border-transparent hover:border-gold-primary pl-0 hover:pl-4 flex items-center gap-3"
-                    >
-                      <User size={18} className="text-gold-primary/40" /> My Profile
+                  {user ? (
+                    <Link
+                        href="/profile"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="block text-lg uppercase tracking-[0.2em] font-medium hover:text-gold-primary transition-all py-1 hover:translate-x-3 duration-300 border-l-2 border-transparent hover:border-gold-primary pl-0 hover:pl-4 flex items-center gap-3"
+                      >
+                        <User size={18} className="text-gold-primary/40" /> My Profile
                     </Link>
+                  ) : (
+                    <button
+                        onClick={() => {
+                          setIsMobileMenuOpen(false);
+                          setShowModal(true);
+                        }}
+                        className="block w-full text-left text-lg uppercase tracking-[0.2em] font-medium hover:text-gold-primary transition-all py-1 hover:translate-x-3 duration-300 border-l-2 border-transparent hover:border-gold-primary pl-0 hover:pl-4 flex items-center gap-3"
+                      >
+                        <User size={18} className="text-gold-primary/40" /> Login
+                    </button>
+                  )}
                 </div>
                 
                 {/* Mobile Language Toggle */}
