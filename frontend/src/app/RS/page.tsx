@@ -11,9 +11,10 @@ import {
   ShoppingCart,
   Clock,
   PieChart,
-  ChevronRight
+  ChevronRight,
+  BellRing
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { API_BASE_URL } from "@/config/apiConfig";
 
@@ -47,6 +48,8 @@ export default function AdminDashboard() {
   });
 
   const [loading, setLoading] = useState(true);
+  const [prevOrdersCount, setPrevOrdersCount] = useState<number | null>(null);
+  const [newOrderNotify, setNewOrderNotify] = useState<any>(null);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -71,14 +74,31 @@ export default function AdminDashboard() {
           categoryDistribution: analytics.categoryDistribution || [],
           recentOrders: analytics.recentOrders || []
         });
+
+        // Dashboard Notification Logic
+        if (prevOrdersCount !== null && (analytics.totalOrders || 0) > prevOrdersCount) {
+          const latestOrder = analytics.recentOrders?.[0];
+          if (latestOrder) {
+            setNewOrderNotify(latestOrder);
+            // Auto hide after 10 seconds
+            setTimeout(() => setNewOrderNotify(null), 10000);
+          }
+        }
+        setPrevOrdersCount(analytics.totalOrders || 0);
+
       } catch (err) {
         console.error("Stats error:", err);
       } finally {
         setLoading(false);
       }
     };
+
     fetchStats();
-  }, []);
+    
+    // Poll for new orders every 30 seconds
+    const interval = setInterval(fetchStats, 30000);
+    return () => clearInterval(interval);
+  }, [prevOrdersCount]);
 
   const cards = [
     { label: "Total Revenue", value: `₹${stats.totalSales}`, icon: TrendingUp, color: "text-green-600", bg: "bg-green-50" },
@@ -115,6 +135,40 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8 pb-12">
+      {/* Global Notifications */}
+      <AnimatePresence>
+        {newOrderNotify && (
+          <motion.div
+            initial={{ opacity: 0, x: 100, scale: 0.9 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 100, scale: 0.9 }}
+            className="fixed top-8 right-8 z-[100] w-80"
+          >
+            <div className="bg-white border-2 border-gold-primary shadow-2xl p-6 relative overflow-hidden group">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gold-primary animate-pulse" />
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-gold-soft/20 rounded-full text-gold-primary">
+                  <BellRing className="animate-bounce" size={24} />
+                </div>
+                <div className="flex-grow">
+                  <h3 className="text-xs uppercase tracking-widest font-bold text-gold-primary mb-1">New Order Received!</h3>
+                  <p className="text-sm font-bold text-foreground mb-1">{newOrderNotify.customerName}</p>
+                  <p className="text-[10px] text-foreground/50 font-medium mb-3">Total: ₹{newOrderNotify.totalPrice}</p>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => setNewOrderNotify(null)}
+                      className="px-4 py-1.5 bg-gold-primary text-white text-[10px] uppercase tracking-widest font-bold hover:bg-gold-accent transition-all"
+                    >
+                      View Order
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <header className="flex flex-col gap-2">
         <h1 className="text-3xl md:text-4xl font-premium font-bold tracking-tight">Executive Summary</h1>
         <div className="flex items-center gap-2">

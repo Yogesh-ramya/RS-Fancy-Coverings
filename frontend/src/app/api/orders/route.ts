@@ -57,6 +57,32 @@ export async function POST(req: NextRequest) {
       status: 'Pending'
     });
 
+    // Send Telegram Notification
+    try {
+      const itemsList = sanitizedItems.length > 0 
+        ? sanitizedItems.map((item: any) => `- ${item.name || 'Product'} (x${item.quantity || 1})`).join('\n')
+        : '- Single Item Order';
+
+      const message = `
+🛍 <b>New Order Received!</b>
+
+👤 <b>Customer:</b> ${customerName}
+📞 <b>Phone:</b> ${phone}
+📍 <b>Address:</b> ${address}, ${pincode}
+🚚 <b>Type:</b> ${orderType}
+
+📦 <b>Items:</b>
+${itemsList}
+
+💰 <b>Total Price:</b> ₹${totalPrice}
+      `.trim();
+
+      const { sendTelegramMessage } = await import('@/lib/telegram');
+      await sendTelegramMessage(message);
+    } catch (err) {
+      console.error("Telegram notify failed:", err);
+    }
+
     return NextResponse.json(order, { status: 201 });
   } catch (error: any) {
     console.error("Order create error:", error);
