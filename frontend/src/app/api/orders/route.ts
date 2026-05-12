@@ -57,30 +57,20 @@ export async function POST(req: NextRequest) {
       status: 'Pending'
     });
 
-    // Send Telegram Notification
+    // Send Email Notification
     try {
-      const itemsList = sanitizedItems.length > 0 
-        ? sanitizedItems.map((item: any) => `- ${item.name || 'Product'} (x${item.quantity || 1})`).join('\n')
-        : '- Single Item Order';
-
-      const message = `
-🛍 <b>New Order Received!</b>
-
-👤 <b>Customer:</b> ${customerName}
-📞 <b>Phone:</b> ${phone}
-📍 <b>Address:</b> ${address}, ${pincode}
-🚚 <b>Type:</b> ${orderType}
-
-📦 <b>Items:</b>
-${itemsList}
-
-💰 <b>Total Price:</b> ₹${totalPrice}
-      `.trim();
-
-      const { sendTelegramMessage } = await import('@/lib/telegram');
-      await sendTelegramMessage(message);
+      const { sendOrderEmail } = await import('@/lib/email');
+      await sendOrderEmail(customerName, {
+        phone,
+        address,
+        pincode,
+        landmark,
+        orderType,
+        items: sanitizedItems,
+        totalPrice
+      });
     } catch (err) {
-      console.error("Telegram notify failed:", err);
+      console.error("Email notify failed:", err);
     }
 
     return NextResponse.json(order, { status: 201 });
