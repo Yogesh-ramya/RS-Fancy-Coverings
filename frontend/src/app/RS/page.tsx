@@ -149,35 +149,148 @@ export default function AdminDashboard() {
         ))}
       </motion.div>
 
+      {/* High-Level Insights / Spotlight */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {stats.topProducts.length > 0 && (
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-gold-soft/5 border border-gold-primary/20 p-6 flex items-center gap-6 relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 p-2 bg-gold-primary text-white text-[8px] uppercase tracking-tighter font-bold">
+              Most Viewed
+            </div>
+            <div className="w-24 h-24 bg-white border border-gold-primary/10 overflow-hidden flex-shrink-0">
+              {stats.topProducts[0]?.images?.[0] ? (
+                <img 
+                  src={stats.topProducts[0].images[0]} 
+                  alt={stats.topProducts[0].name_en} 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gold-primary/20">
+                  <Package size={32} />
+                </div>
+              )}
+            </div>
+            <div className="flex-1">
+              <h3 className="text-xs uppercase tracking-widest text-gold-primary font-bold mb-1">Top Performer</h3>
+              <h2 className="text-xl font-premium font-bold text-foreground/80 mb-2 truncate max-w-[200px]">
+                {stats.topProducts[0].name_en}
+              </h2>
+              <div className="flex items-center gap-4">
+                <div>
+                  <p className="text-[10px] text-foreground/40 uppercase">Total Interest</p>
+                  <p className="text-lg font-bold text-gold-primary">{stats.topProducts[0].views} Views</p>
+                </div>
+                <div className="h-8 w-[1px] bg-gold-primary/10"></div>
+                <div>
+                  <p className="text-[10px] text-foreground/40 uppercase">Price</p>
+                  <p className="text-lg font-bold text-foreground/60">₹{stats.topProducts[0].price}</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {stats.mostSoldProducts.length > 0 && (
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-green-50/30 border border-green-100 p-6 flex items-center gap-6 relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 p-2 bg-green-600 text-white text-[8px] uppercase tracking-tighter font-bold">
+              Best Seller
+            </div>
+            <div className="w-24 h-24 bg-white border border-green-100 overflow-hidden flex-shrink-0">
+              {stats.mostSoldProducts[0]?.images?.[0] ? (
+                <img 
+                  src={stats.mostSoldProducts[0].images[0]} 
+                  alt={stats.mostSoldProducts[0].name_en} 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-green-200">
+                  <ShoppingBag size={32} />
+                </div>
+              )}
+            </div>
+            <div className="flex-1">
+              <h3 className="text-xs uppercase tracking-widest text-green-600 font-bold mb-1">Customer Choice</h3>
+              <h2 className="text-xl font-premium font-bold text-foreground/80 mb-2 truncate max-w-[200px]">
+                {stats.mostSoldProducts[0].name_en}
+              </h2>
+              <div className="flex items-center gap-4">
+                <div>
+                  <p className="text-[10px] text-foreground/40 uppercase">Total Sales</p>
+                  <p className="text-lg font-bold text-green-600">{stats.mostSoldProducts[0].salesCount} Units</p>
+                </div>
+                <div className="h-8 w-[1px] bg-green-100"></div>
+                <div>
+                  <p className="text-[10px] text-foreground/40 uppercase">Revenue</p>
+                  <p className="text-lg font-bold text-foreground/60">₹{stats.mostSoldProducts[0].price * stats.mostSoldProducts[0].salesCount}</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Most Popular Products */}
         <div className="lg:col-span-2 bg-white border border-gold-primary/10 p-6 sm:p-8 shadow-sm">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-xl font-premium font-bold tracking-tight flex items-center gap-2">
               <TrendingUp size={20} className="text-gold-primary" />
-              Most Popular Products
+              Detailed Engagement Metrics
             </h2>
-            <button className="text-[10px] uppercase tracking-widest font-bold text-gold-primary hover:underline">View All</button>
+            <div className="flex gap-2">
+              <span className="px-3 py-1 bg-gold-soft/10 text-gold-primary text-[10px] font-bold uppercase tracking-widest border border-gold-primary/10">Most Viewed</span>
+            </div>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left font-sans">
               <thead>
                 <tr className="text-[10px] uppercase tracking-widest text-foreground/40 border-b border-gold-primary/10">
-                  <th className="pb-4">Product</th>
+                  <th className="pb-4">Product Info</th>
                   <th className="pb-4">Category</th>
                   <th className="pb-4">Price</th>
-                  <th className="pb-4 text-right">Views</th>
+                  <th className="pb-4 text-right">Engagement</th>
                 </tr>
               </thead>
               <tbody className="text-sm">
                 {stats.topProducts.map((product: any, idx: number) => (
                   <tr key={idx} className="border-b border-gold-primary/5 hover:bg-gold-soft/5 transition-colors group">
-                    <td className="py-4 font-medium text-foreground/80 group-hover:text-gold-primary transition-colors">
-                      {product.name_en}
+                    <td className="py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gold-soft/5 border border-gold-primary/10 overflow-hidden flex-shrink-0">
+                          {product.images?.[0] ? (
+                            <img src={product.images[0]} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gold-primary/20">
+                              <Package size={16} />
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground/80 group-hover:text-gold-primary transition-colors">{product.name_en}</p>
+                          <p className="text-[10px] text-foreground/40 uppercase tracking-tighter">ID: {product._id.substring(0, 8)}...</p>
+                        </div>
+                      </div>
                     </td>
                     <td className="py-4 text-foreground/50">{product.category}</td>
                     <td className="py-4 text-foreground/50">₹{product.price}</td>
-                    <td className="py-4 text-right font-bold text-gold-primary">{product.views}</td>
+                    <td className="py-4 text-right">
+                      <div className="flex flex-col items-end">
+                        <span className="font-bold text-gold-primary">{product.views} Views</span>
+                        <div className="w-16 h-1 bg-gold-soft/20 rounded-full mt-1 overflow-hidden">
+                          <div 
+                            className="h-full bg-gold-primary" 
+                            style={{ width: `${(product.views / (stats.topProducts[0]?.views || 1)) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    </td>
                   </tr>
                 ))}
                 {stats.topProducts.length === 0 && (
@@ -189,6 +302,7 @@ export default function AdminDashboard() {
             </table>
           </div>
         </div>
+
 
         {/* System Alerts & Notifications */}
         <div className="space-y-6">

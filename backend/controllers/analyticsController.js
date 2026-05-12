@@ -73,7 +73,7 @@ exports.getStats = async (req, res) => {
     const topProducts = await Product.find()
       .sort({ views: -1 })
       .limit(5)
-      .select('name_en views price category');
+      .select('name_en views price category images');
 
     // Get total orders and revenue
     const orders = await Order.find({ status: { $ne: 'Cancelled' } });
@@ -97,10 +97,11 @@ exports.getStats = async (req, res) => {
 
     const mostSoldProducts = await Promise.all(
       sortedSales.map(async ([id, count]) => {
-        const product = await Product.findById(id).select('name_en category price');
+        const product = await Product.findById(id).select('name_en category price images');
         return product ? { ...product._doc, salesCount: count } : null;
       })
     );
+
 
     // Category distribution
     const categories = await Product.aggregate([
