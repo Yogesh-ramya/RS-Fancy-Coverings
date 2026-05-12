@@ -1,5 +1,6 @@
 const { SiteStats, Visitor } = require('../models/analytics');
 const Product = require('../models/product');
+const Order = require('../models/order');
 
 // Track Website Visit
 exports.trackVisit = async (req, res) => {
@@ -65,19 +66,67 @@ exports.getStats = async (req, res) => {
   try {
     const stats = await SiteStats.findOne() || { totalViews: 0, totalVisitors: 0 };
     
+    // Get total products
+    const totalProducts = await Product.countDocuments();
+
     // Get top 5 most viewed products
     const topProducts = await Product.find()
       .sort({ views: -1 })
       .limit(5)
       .select('name_en views price category');
 
+    // Get total orders and revenue
+    const orders = await Order.find({ status: { $ne: 'Cancelled' } });
+    const totalOrders = orders.length;
+    const totalRevenue = orders.reduce((acc, order) => acc + (order.totalPrice || 0), 0);
+
+    // Calculate most sold products
+    const productSales = {};
+    orders.forEach(order => {
+      order.items.forEach(item => {
+        if (item.productId) {
+          const id = item.productId.toString();
+          productSales[id] = (productSales[id] || 0) + (item.quantity || 1);
+        }
+      });
+    });
+
+    const sortedSales = Object.entries(productSales)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 5);
+
+    const mostSoldProducts = await Promise.all(
+      sortedSales.map(async ([id, count]) => {
+        const product = await Product.findById(id).select('name_en category price');
+        return product ? { ...product._doc, salesCount: count } : null;
+      })
+    );
+
+    // Category distribution
+    const categories = await Product.aggregate([
+      { $group: { _id: '$category', count: { $sum: 1 } } }
+    ]);
+
+    // Recent orders (last 5)
+    const recentOrders = await Order.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select('customerName totalPrice status createdAt');
+
     res.status(200).json({
       totalViews: stats.totalViews,
       totalVisitors: stats.totalVisitors,
-      topProducts
+      totalProducts,
+      totalOrders,
+      totalRevenue,
+      topProducts,
+      mostSoldProducts: mostSoldProducts.filter(p => p !== null),
+      categoryDistribution: categories,
+      recentOrders
     });
   } catch (error) {
     console.error('Error getting stats:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
