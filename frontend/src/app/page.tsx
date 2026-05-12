@@ -102,6 +102,7 @@ function HomeContent() {
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState("newest");
   const [currentPage, setCurrentPage] = useState(1);
+  const [direction, setDirection] = useState(0); // -1 for prev, 1 for next
   const ITEMS_PER_PAGE = 15;
 
   useEffect(() => {
@@ -147,6 +148,24 @@ function HomeContent() {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentItems = filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
+  const handlePageChange = (newPage: number) => {
+    setDirection(newPage > currentPage ? 1 : -1);
+    setCurrentPage(newPage);
+    
+    // Smooth scroll to top of products section
+    const element = document.getElementById("products");
+    if (element) {
+      const offset = 100; // Adjust for navbar
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      });
+    }
+  };
+
   const Pagination = () => {
     if (totalPages <= 1) return null;
     
@@ -154,7 +173,7 @@ function HomeContent() {
       <div className="mt-20 flex flex-col items-center gap-6">
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
             disabled={currentPage === 1}
             className={`px-6 py-3 text-[10px] uppercase tracking-widest font-bold border transition-all
               ${currentPage === 1 
@@ -169,13 +188,25 @@ function HomeContent() {
             <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-foreground/40">
               {t("page")}
             </span>
-            <span className="text-sm font-premium font-bold text-gold-primary">
-              {currentPage} <span className="text-foreground/20 font-normal mx-2">/</span> {totalPages}
+            <span className="text-sm font-premium font-bold text-gold-primary min-w-[3ch] text-center">
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={currentPage}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="inline-block"
+                >
+                  {currentPage}
+                </motion.span>
+              </AnimatePresence>
+              <span className="text-foreground/20 font-normal mx-2">/</span> {totalPages}
             </span>
           </div>
 
           <button
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
             disabled={currentPage === totalPages}
             className={`px-6 py-3 text-[10px] uppercase tracking-widest font-bold border transition-all
               ${currentPage === totalPages 
@@ -251,22 +282,21 @@ function HomeContent() {
         ) : (
           <>
             <motion.div 
-              layout
-              className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8"
+              className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 min-h-[600px]"
             >
-              <AnimatePresence mode="popLayout">
-                {currentItems.map((product) => (
-                  <motion.div
-                    key={product._id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <ProductCard product={product} />
-                  </motion.div>
-                ))}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentPage}
+                  initial={{ opacity: 0, x: direction * 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -direction * 50 }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 col-span-full"
+                >
+                  {currentItems.map((product) => (
+                    <ProductCard key={product._id} product={product} />
+                  ))}
+                </motion.div>
               </AnimatePresence>
             </motion.div>
             
