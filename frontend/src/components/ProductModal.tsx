@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCart } from "@/context/CartContext";
 import { ShoppingCart, MessageCircle, X, Check, XCircle } from "lucide-react";
+import ShareProduct from "./ShareProduct";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
 import { API_BASE_URL } from "@/config/apiConfig";
@@ -188,6 +189,10 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
                   <MessageCircle size={18} />
                   {t("whatsappOrder")}
                 </button>
+              </div>
+
+              <div className="mt-8">
+                <ShareProduct product={product} variant="full" />
               </div>
 
               <div className="mt-8 pt-8 border-t border-gold-primary/5">

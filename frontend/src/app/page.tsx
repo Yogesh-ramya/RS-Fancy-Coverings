@@ -7,6 +7,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import ProductCard from "@/components/ProductCard";
+import ProductModal from "@/components/ProductModal";
 import { useLanguage } from "@/context/LanguageContext";
 import { Search, ChevronDown, Check, SlidersHorizontal } from "lucide-react";
 
@@ -103,7 +104,18 @@ function HomeContent() {
   const [sortBy, setSortBy] = useState("newest");
   const [currentPage, setCurrentPage] = useState(1);
   const [direction, setDirection] = useState(0); // -1 for prev, 1 for next
+  const [sharedProduct, setSharedProduct] = useState<any>(null);
   const ITEMS_PER_PAGE = 15;
+
+  useEffect(() => {
+    const productId = searchParams.get("product");
+    if (productId && allProducts.length > 0) {
+      const product = allProducts.find(p => p._id === productId);
+      if (product) {
+        setSharedProduct(product);
+      }
+    }
+  }, [searchParams, allProducts]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -304,6 +316,21 @@ function HomeContent() {
           </>
         )}
       </section>
+
+      {/* Deep Linked Product Modal */}
+      {sharedProduct && (
+        <ProductModal 
+          product={sharedProduct}
+          isOpen={!!sharedProduct}
+          onClose={() => {
+            setSharedProduct(null);
+            const params = new URLSearchParams(window.location.search);
+            params.delete("product");
+            const newUrl = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
+            window.history.replaceState({}, "", newUrl);
+          }}
+        />
+      )}
 
       {/* Footer / Contact */}
       <footer className="mt-32 border-t border-gold-primary/10 pt-20 pb-10 text-center">

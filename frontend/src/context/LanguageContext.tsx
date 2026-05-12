@@ -50,6 +50,9 @@ const translations = {
     totalBill: "Total Bill",
     freeDelivery: "FREE",
     orderSummary: "Order Summary",
+    share: "Share",
+    copyLink: "Copy Link",
+    linkCopied: "Link Copied!",
   },
   ta: {
     heroTitle: "நேர்த்தியான கவரிங் நகைகள்",
@@ -90,6 +93,9 @@ const translations = {
     totalBill: "மொத்த பில்",
     freeDelivery: "இலவசம்",
     orderSummary: "ஆர்டர் சுருக்கம்",
+    share: "பகிர்",
+    copyLink: "இணைப்பை நகலெடு",
+    linkCopied: "இணைப்பு நகலெடுக்கப்பட்டது!",
   },
 };
 
