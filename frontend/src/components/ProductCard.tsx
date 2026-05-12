@@ -72,15 +72,14 @@ export default function ProductCard({ product }: ProductCardProps) {
             </div>
           )}
 
-          {/* Categories Tag */}
           <div className="absolute bottom-4 right-4 text-[10px] uppercase tracking-widest text-gold-primary bg-white/90 px-3 py-1.5 backdrop-blur-sm border border-gold-primary/20">
             {product.category}
           </div>
+        </div>
 
-          {/* Share Button */}
-          <div className="absolute top-4 right-4 z-10">
-            <ShareProduct product={product} variant="icon" />
-          </div>
+        {/* Share Button - Moved outside the clickable image div */}
+        <div className="absolute top-4 right-4 z-[30]">
+          <ShareProduct product={product} variant="icon" />
         </div>
 
         {/* Product Details */}

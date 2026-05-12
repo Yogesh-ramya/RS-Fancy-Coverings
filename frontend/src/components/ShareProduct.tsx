@@ -78,13 +78,14 @@ export default function ShareProduct({ product, variant = "full" }: ShareProduct
       <div className="relative">
         <button
           onClick={(e) => {
+            e.preventDefault();
             e.stopPropagation();
             setIsOpen(!isOpen);
           }}
-          className="p-2 bg-white/90 backdrop-blur-sm rounded-full border border-gold-primary/20 text-gold-primary hover:bg-gold-primary hover:text-white transition-all shadow-sm"
+          className="p-2.5 bg-white/95 backdrop-blur-md rounded-full border border-gold-primary/30 text-gold-primary hover:bg-gold-primary hover:text-white transition-all shadow-lg active:scale-90"
           title={t("share")}
         >
-          <Share2 size={16} />
+          <Share2 size={18} />
         </button>
 
         <AnimatePresence>
@@ -95,26 +96,28 @@ export default function ShareProduct({ product, variant = "full" }: ShareProduct
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={(e) => {
+                  e.preventDefault();
                   e.stopPropagation();
                   setIsOpen(false);
                 }}
-                className="fixed inset-0 z-[60]"
+                className="fixed inset-0 z-[60] bg-black/5"
               />
               <motion.div
-                initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                initial={{ opacity: 0, scale: 0.9, y: -10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: 10 }}
-                className="absolute bottom-full right-0 mb-2 bg-white border border-gold-primary/10 shadow-xl rounded-xl p-2 z-[70] flex flex-col gap-1 min-w-[140px]"
+                exit={{ opacity: 0, scale: 0.9, y: -10 }}
+                className="absolute top-full right-0 mt-3 bg-white border border-gold-primary/20 shadow-2xl rounded-xl p-2 z-[70] flex flex-col gap-1 min-w-[150px]"
               >
                 {shareOptions.map((option) => (
                   <button
                     key={option.name}
                     onClick={(e) => {
+                      e.preventDefault();
                       e.stopPropagation();
                       option.action();
                       if (option.name !== t("copyLink")) setIsOpen(false);
                     }}
-                    className="flex items-center gap-3 px-3 py-2 text-[10px] uppercase tracking-widest font-bold text-foreground/70 hover:bg-gold-soft/10 hover:text-gold-primary rounded-lg transition-all text-left"
+                    className="flex items-center gap-3 px-4 py-2.5 text-[10px] uppercase tracking-widest font-bold text-foreground/70 hover:bg-gold-soft/10 hover:text-gold-primary rounded-lg transition-all text-left w-full whitespace-nowrap"
                   >
                     <span style={{ color: option.color }}>{option.icon}</span>
                     {option.name}
