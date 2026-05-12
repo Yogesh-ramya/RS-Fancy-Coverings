@@ -23,7 +23,7 @@ export async function sendOrderEmail(customerName: string, orderData: any) {
 
   const mailOptions = {
     from: `"RS Fancy Coverings" <${user}>`,
-    to: user, // Send to yourself
+    to: process.env.EMAIL_TO || user, // Can be a comma-separated list
     subject: `New Order Received from ${customerName}`,
     html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; padding: 20px;">
