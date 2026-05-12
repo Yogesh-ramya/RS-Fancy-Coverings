@@ -5,6 +5,10 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useCart } from "@/context/CartContext";
 import { ShoppingCart, MessageCircle, X, Check, XCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useEffect } from "react";
+import { API_BASE_URL } from "@/config/apiConfig";
+
+const API_URL = `${API_BASE_URL}/api/analytics`;
 
 import Image from "next/image";
 
@@ -29,6 +33,21 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
   const { language, t } = useLanguage();
   const { addToCart } = useCart();
   const [selectedImage, setSelectedImage] = useState(0);
+
+  useEffect(() => {
+    if (isOpen && product?._id) {
+      const trackProductView = async () => {
+        try {
+          await fetch(`${API_URL}/product/${product._id}/view`, {
+            method: 'POST',
+          });
+        } catch (error) {
+          console.error('Failed to track product view:', error);
+        }
+      };
+      trackProductView();
+    }
+  }, [isOpen, product?._id]);
 
   const name = language === "en" ? product.name_en : product.name_ta;
   const description = language === "en" ? product.description_en : product.description_ta;

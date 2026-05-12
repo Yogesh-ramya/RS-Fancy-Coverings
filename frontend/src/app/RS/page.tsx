@@ -17,7 +17,10 @@ export default function AdminDashboard() {
     totalSales: 0,
     totalOrders: 0,
     lowStock: 0,
-    newCustomers: 0
+    newCustomers: 0,
+    totalViews: 0,
+    totalVisitors: 0,
+    topProducts: []
   });
   const [loading, setLoading] = useState(true);
 
@@ -33,11 +36,17 @@ export default function AdminDashboard() {
         const totalSales = orders.reduce((acc: number, o: any) => acc + (o.totalPrice || 0), 0);
         const lowStock = products.filter((p: any) => p.stock <= 5).length;
 
+        const analyticsRes = await fetch(`${API_BASE_URL}/api/analytics/stats`);
+        const analytics = await analyticsRes.json();
+
         setStats({
           totalSales,
           totalOrders: orders.length,
           lowStock,
-          newCustomers: Array.from(new Set(orders.map((o: any) => o.phone))).length
+          newCustomers: Array.from(new Set(orders.map((o: any) => o.phone))).length,
+          totalViews: analytics.totalViews,
+          totalVisitors: analytics.totalVisitors,
+          topProducts: analytics.topProducts || []
         });
       } catch (err) {
         console.error("Stats error:", err);
@@ -50,9 +59,9 @@ export default function AdminDashboard() {
 
   const cards = [
     { label: "Total Revenue", value: `₹${stats.totalSales}`, icon: TrendingUp, color: "text-green-600", bg: "bg-green-50" },
-    { label: "Total Orders", value: stats.totalOrders, icon: ShoppingBag, color: "text-blue-600", bg: "bg-blue-50" },
-    { label: "Low Stock Items", value: stats.lowStock, icon: AlertTriangle, color: "text-red-600", bg: "bg-red-50" },
-    { label: "Unique Customers", value: stats.newCustomers, icon: Users, color: "text-gold-primary", bg: "bg-gold-soft/20" },
+    { label: "Website Views", value: stats.totalViews, icon: ArrowUpRight, color: "text-purple-600", bg: "bg-purple-50" },
+    { label: "Unique Visitors", value: stats.totalVisitors, icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
+    { label: "Total Orders", value: stats.totalOrders, icon: ShoppingBag, color: "text-gold-primary", bg: "bg-gold-soft/20" },
   ];
 
   return (
@@ -106,10 +115,33 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-12">
         <div className="lg:col-span-2 bg-white border border-gold-primary/10 p-6 sm:p-10 shadow-sm min-h-[400px]">
-          <h2 className="text-xl font-premium font-bold mb-8 tracking-tight">Sales Analytics</h2>
-          <div className="h-full flex flex-col items-center justify-center text-foreground/20 italic">
-            Visual analytics will appear after more historical data is gathered.
-            <div className="h-40 w-full bg-gold-soft/5 mt-8 border-t border-gold-primary/10 border-dashed" />
+          <h2 className="text-xl font-premium font-bold mb-8 tracking-tight">Most Popular Products</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left font-sans">
+              <thead>
+                <tr className="text-[10px] uppercase tracking-widest text-foreground/40 border-b border-gold-primary/10">
+                  <th className="pb-4">Product Name</th>
+                  <th className="pb-4">Category</th>
+                  <th className="pb-4">Price</th>
+                  <th className="pb-4 text-right">Total Views</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm">
+                {stats.topProducts.map((product: any, idx: number) => (
+                  <tr key={idx} className="border-b border-gold-primary/5 hover:bg-gold-soft/5 transition-colors">
+                    <td className="py-4 font-medium text-foreground/80">{product.name_en}</td>
+                    <td className="py-4 text-foreground/50">{product.category}</td>
+                    <td className="py-4 text-foreground/50">₹{product.price}</td>
+                    <td className="py-4 text-right font-bold text-gold-primary">{product.views}</td>
+                  </tr>
+                ))}
+                {stats.topProducts.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="py-10 text-center text-foreground/20 italic">No view data available yet.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
 

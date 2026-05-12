@@ -19,7 +19,8 @@ const productSchema = new mongoose.Schema({
     size: { type: String },
     plating: { type: String }
   }],
-  isTrending: { type: Boolean, default: false }
+  isTrending: { type: Boolean, default: false },
+  views: { type: Number, default: 0 }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Product', productSchema);

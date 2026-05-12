@@ -50,6 +50,7 @@ export const metadata: Metadata = {
 
 import { UserAuthProvider } from "@/context/UserAuthContext";
 import AuthModal from "@/components/AuthModal";
+import AnalyticsTracker from "@/components/AnalyticsTracker";
 
 export default function RootLayout({
   children,
@@ -67,6 +68,7 @@ export default function RootLayout({
             <UserAuthProvider>
               {children}
               <AuthModal />
+              <AnalyticsTracker />
             </UserAuthProvider>
           </CartProvider>
         </LanguageProvider>

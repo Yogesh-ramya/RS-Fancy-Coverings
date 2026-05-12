@@ -9,6 +9,7 @@ const fs = require('fs');
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.use('/uploads', express.static(uploadDir));
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 app.get('/', (req, res) => {
   res.send('RS Fancy Coverings API is running...');
