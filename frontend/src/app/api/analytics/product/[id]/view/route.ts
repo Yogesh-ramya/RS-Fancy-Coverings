@@ -9,6 +9,7 @@ export async function POST(
   try {
     await connectDB();
     const { id } = await params;
+    console.log(`[Analytics] Incrementing views for product: ${id}`);
 
     const product = await Product.findByIdAndUpdate(
       id,

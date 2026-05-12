@@ -6,6 +6,7 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
     const { visitorId } = await req.json();
+    console.log(`[Analytics] Tracking visit for visitor: ${visitorId}`);
 
     // 1. Update Total Views
     let stats = await SiteStats.findOne();
