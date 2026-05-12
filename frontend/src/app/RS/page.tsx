@@ -17,8 +17,22 @@ import { motion } from "framer-motion";
 
 import { API_BASE_URL } from "@/config/apiConfig";
 
+interface DashboardStats {
+  totalSales: number;
+  totalOrders: number;
+  totalProducts: number;
+  lowStock: number;
+  newCustomers: number;
+  totalViews: number;
+  totalVisitors: number;
+  topProducts: any[];
+  mostSoldProducts: any[];
+  categoryDistribution: any[];
+  recentOrders: any[];
+}
+
 export default function AdminDashboard() {
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<DashboardStats>({
     totalSales: 0,
     totalOrders: 0,
     totalProducts: 0,
@@ -31,6 +45,7 @@ export default function AdminDashboard() {
     categoryDistribution: [],
     recentOrders: []
   });
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
