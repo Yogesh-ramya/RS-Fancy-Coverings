@@ -18,6 +18,7 @@ export interface IProduct extends Document {
   images: string[];
   variants: IVariant[];
   isTrending: boolean;
+  views: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -41,7 +42,8 @@ const ProductSchema: Schema = new Schema({
     size: { type: String },
     plating: { type: String }
   }],
-  isTrending: { type: Boolean, default: false }
+  isTrending: { type: Boolean, default: false },
+  views: { type: Number, default: 0 }
 }, { timestamps: true });
 
 // Check if the model exists before compiling to prevent OverwriteModelError in Next.js HMR
